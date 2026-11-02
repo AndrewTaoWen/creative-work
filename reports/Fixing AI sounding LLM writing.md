@@ -34,7 +34,7 @@ So the problem may be less a sudden decline than a persistent house style that r
 | Provider | Current rule |
 |---|---|
 | OpenAI | [Remove `temperature` and `top_p`](https://developers.openai.com/api/docs/guides/latest-model) whenever reasoning effort isn't `none`. GPT-6 Astra and GPT-6.1 Sol don't accept `none`. GPT-6.1 Terra, GPT-6 Sol and GPT-6 Luna do. |
-| Anthropic | [Claude Opus 5.5 rejects sampling parameters](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide) with a 400 error and recommends prompting instead. I didn't confirm the rule for every Claude model. |
+| Anthropic | [Claude Opus 5.5 rejects sampling parameters](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide) with a 400 error and recommends prompting instead. On [API version 2026-10-21](https://platform.claude.com/docs/en/api/migration-2026-10-21), sending them returns a 400 on every model, even at default values. |
 
 Open-weight models keep full sampler control. I didn't check Gemini, xAI, DeepSeek or Mistral.
 
