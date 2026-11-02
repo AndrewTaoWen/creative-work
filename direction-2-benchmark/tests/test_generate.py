@@ -38,9 +38,15 @@ class ExperimentTests(unittest.TestCase):
             path.write_text(json.dumps({"conditions": list(conditions)}))
             return load_experiment(path)
 
-    def test_first_experiment_loads(self):
-        conditions = load_experiment(ROOT / "experiments" / "first.json")
-        self.assertEqual(len(conditions), 7)
+    def test_first_experiments_load_without_clashing(self):
+        benchmark = load_experiment(ROOT / "experiments" / "first.json")
+        temperature_judge = load_experiment(
+            ROOT.parent / "direction-1-temperature-judge" / "experiments" / "first.json"
+        )
+        self.assertEqual(len(benchmark), 3)
+        self.assertEqual(len(temperature_judge), 4)
+        # Both share one run folder, so a repeated id would mix their outputs.
+        self.assertFalse({c.id for c in benchmark} & {c.id for c in temperature_judge})
 
     def test_rejects_temperature_on_claude(self):
         raw = {"id": "x", "provider": "claude", "model": "m", "effort": "medium",
