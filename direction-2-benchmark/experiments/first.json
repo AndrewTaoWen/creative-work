@@ -1,0 +1,7 @@
+{
+  "conditions": [
+    {"id": "opus-default", "provider": "claude", "model": "claude-opus-5-5", "effort": "medium", "prompt": "plain"},
+    {"id": "opus-style-guide", "provider": "claude", "model": "claude-opus-5-5", "effort": "medium", "prompt": "style_guide"},
+    {"id": "opus-few-shot", "provider": "claude", "model": "claude-opus-5-5", "effort": "medium", "prompt": "few_shot"}
+  ]
+}

@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from voicebench.cli import main
 from voicebench.experiment import Condition, load_experiment
 from voicebench.generate import MANIFEST_NAME, count_calls, plan_jobs, run_jobs, select_draft
 from voicebench.prompts import build_system, load_examples
@@ -36,6 +37,16 @@ class ExperimentTests(unittest.TestCase):
             path = Path(folder, "e.json")
             path.write_text(json.dumps({"conditions": list(conditions)}))
             return load_experiment(path)
+
+    def test_first_experiments_load_without_clashing(self):
+        benchmark = load_experiment(ROOT / "experiments" / "first.json")
+        temperature_judge = load_experiment(
+            ROOT.parent / "direction-1-temperature-judge" / "experiments" / "first.json"
+        )
+        self.assertEqual(len(benchmark), 3)
+        self.assertEqual(len(temperature_judge), 4)
+        # Both share one run folder, so a repeated id would mix their outputs.
+        self.assertFalse({c.id for c in benchmark} & {c.id for c in temperature_judge})
 
     def test_rejects_temperature_on_claude(self):
         raw = {"id": "x", "provider": "claude", "model": "m", "effort": "medium",
@@ -133,6 +144,20 @@ class RunnerTests(unittest.TestCase):
                  "morning works. Please don't hesitate to reach out.")
         clean = "Thursday won't work because of an exam. Friday after 1pm or Monday morning works."
         self.assertEqual(select_draft(task, [fails, stock, clean]), clean)
+
+    def test_dry_run_sends_nothing(self):
+        code = main(["--tasks", str(TASKS_DIR), "generate",
+                     str(ROOT / "experiments" / "first.json"), "--run", str(self.run_dir),
+                     "--human", str(Path(self.folder.name, "missing")),
+                     "--only", "opus-default"])
+        self.assertEqual(code, 0)
+        self.assertFalse(self.run_dir.exists())
+
+    def test_few_shot_without_examples_fails_clearly(self):
+        code = main(["--tasks", str(TASKS_DIR), "generate",
+                     str(ROOT / "experiments" / "first.json"), "--run", str(self.run_dir),
+                     "--human", str(Path(self.folder.name, "missing"))])
+        self.assertEqual(code, 1)
 
 
 if __name__ == "__main__":
