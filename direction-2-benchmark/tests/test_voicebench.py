@@ -4,7 +4,9 @@ import unittest
 from pathlib import Path
 
 from voicebench.gate import check_gate
+from voicebench.style import Baseline
 from voicebench.tasks import load_tasks
+from voicebench.tells import tell_counts, tell_rate
 
 TASKS_DIR = Path(__file__).parent.parent / "tasks"
 
@@ -12,6 +14,11 @@ TASKS_DIR = Path(__file__).parent.parent / "tasks"
 PASSING_EMAIL = (
     "Hi Priya, Thursday won't work because I have an exam that afternoon. "
     "Friday after 1pm or Monday morning would both be fine. Sam"
+)
+TELL_HEAVY_EMAIL = (
+    "I hope this email finds you well. Moreover, this is not just a date change but a "
+    "testament to my commitment. **Friday** works.\n- Monday\n"
+    "Please don't hesitate to reach out."
 )
 
 
@@ -71,6 +78,44 @@ class SampleTests(unittest.TestCase):
                 self.assertEqual(result.missing_facts, ())
                 self.assertEqual(result.forbidden_hits, ())
                 self.assertFalse(result.over_limit)
+
+
+class TellTests(unittest.TestCase):
+    def test_finds_each_category(self):
+        counts = tell_counts(TELL_HEAVY_EMAIL, "email")
+        for name in ("negative_parallelism", "pet_words", "stock_phrases",
+                     "inflated_significance", "email_markup"):
+            self.assertGreater(counts[name], 0, name)
+
+    def test_markup_only_counts_in_email(self):
+        self.assertNotIn("email_markup", tell_counts("# Title", "takehome"))
+
+    def test_clean_text_has_no_tells(self):
+        self.assertEqual(tell_rate(PASSING_EMAIL, "email"), 0)
+
+    def test_empty_text(self):
+        self.assertEqual(tell_rate("", "email"), 0)
+
+
+class StyleTests(unittest.TestCase):
+    def test_needs_enough_texts(self):
+        with self.assertRaisesRegex(ValueError, "at least"):
+            Baseline(["one", "two"])
+
+    def test_closer_text_scores_lower(self):
+        baseline = Baseline([
+            "I can't make it. Sorry about that.",
+            "We're out Friday. I'll call you.",
+            "I didn't see this. Can we talk?",
+            "That's fine by me. Thanks.",
+            "I'm around Monday. Let's chat then.",
+        ])
+        similar = "I can't do Friday. We'll chat Monday."
+        different = (
+            "The implementation of organizational documentation requirements "
+            "necessitates comprehensive consideration of operational functionality."
+        )
+        self.assertLess(baseline.distance(similar), baseline.distance(different))
 
 
 if __name__ == "__main__":
