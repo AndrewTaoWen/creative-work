@@ -1,9 +1,14 @@
+import csv
 import json
 import tempfile
 import unittest
 from pathlib import Path
 
+from voicebench.cli import main
 from voicebench.gate import check_gate
+from voicebench.panel import KEY_NAME, SHEET_NAME, build_packet
+from voicebench.runs import Output, load_run
+from voicebench.scoring import load_baselines, score_output
 from voicebench.style import Baseline
 from voicebench.tasks import load_tasks
 from voicebench.tells import tell_counts, tell_rate
@@ -116,6 +121,67 @@ class StyleTests(unittest.TestCase):
             "necessitates comprehensive consideration of operational functionality."
         )
         self.assertLess(baseline.distance(similar), baseline.distance(different))
+
+
+class RunTests(unittest.TestCase):
+    def setUp(self):
+        self.tasks = load_tasks(TASKS_DIR)
+        self.folder = tempfile.TemporaryDirectory()
+        self.addCleanup(self.folder.cleanup)
+        self.run_dir = Path(self.folder.name, "run")
+        for condition, text in (("plain", PASSING_EMAIL), ("stock", TELL_HEAVY_EMAIL)):
+            path = self.run_dir / condition / "email-01-reschedule.txt"
+            path.parent.mkdir(parents=True)
+            path.write_text(text, encoding="utf-8")
+
+    def test_rejects_unknown_task(self):
+        path = self.run_dir / "plain" / "nope.txt"
+        path.write_text("hello", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "no task named"):
+            load_run(self.run_dir, self.tasks)
+
+    def test_rejects_empty_output(self):
+        path = self.run_dir / "plain" / "email-02-slip.txt"
+        path.write_text("  ", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "empty"):
+            load_run(self.run_dir, self.tasks)
+
+    def test_score_command(self):
+        code = main(["--tasks", str(TASKS_DIR), "score", str(self.run_dir)])
+        self.assertEqual(code, 0)
+        with (self.run_dir / "scores.csv").open(encoding="utf-8") as file:
+            rows = {row["condition"]: row for row in csv.DictReader(file)}
+        self.assertEqual(rows["plain"]["gate_passed"], "True")
+        self.assertEqual(rows["stock"]["gate_passed"], "False")
+        self.assertEqual(float(rows["plain"]["tell_rate"]), 0)
+        self.assertGreater(float(rows["stock"]["tell_rate"]), 0)
+        self.assertEqual(rows["plain"]["style_distance"], "")
+
+    def test_style_distance_uses_matching_kind(self):
+        human = Path(self.folder.name, "human", "email")
+        human.mkdir(parents=True)
+        for index in range(5):
+            (human / f"{index}.txt").write_text(f"I can't today. Sorry {index}.")
+        output = Output("plain", self.tasks["email-01-reschedule"], PASSING_EMAIL)
+        row = score_output(output, load_baselines(human.parent))
+        self.assertNotEqual(row["style_distance"], "")
+
+    def test_panel_hides_condition_and_gates_failures(self):
+        outputs = load_run(self.run_dir, self.tasks)
+        out = Path(self.folder.name, "panel")
+        self.assertEqual(build_packet(outputs, out, seed=1), 1)
+        sheet = (out / SHEET_NAME).read_text(encoding="utf-8")
+        with (out / KEY_NAME).open(encoding="utf-8") as file:
+            key = list(csv.DictReader(file))
+        self.assertEqual([row["condition"] for row in key], ["plain"])
+        self.assertNotIn("plain", sheet.lower().split("\n")[0])
+        self.assertNotIn("condition", sheet)
+        self.assertNotIn("email-01", sheet)
+
+    def test_panel_can_include_failures(self):
+        outputs = load_run(self.run_dir, self.tasks)
+        out = Path(self.folder.name, "panel")
+        self.assertEqual(build_packet(outputs, out, seed=1, include_failed=True), 2)
 
 
 if __name__ == "__main__":
