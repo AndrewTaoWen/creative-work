@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+
+# Private writing samples, model outputs and rating keys.
+**/data/human/
+runs/
+panel/
