@@ -10,7 +10,7 @@ from voicebench.panel import KEY_NAME, SHEET_NAME, build_packet
 from voicebench.runs import Output, load_run
 from voicebench.scoring import load_baselines, score_output
 from voicebench.style import Baseline
-from voicebench.tasks import load_tasks
+from voicebench.tasks import load_tasks, select_split
 from voicebench.tells import tell_counts, tell_rate
 
 TASKS_DIR = Path(__file__).parent.parent / "tasks"
@@ -27,6 +27,20 @@ TELL_HEAVY_EMAIL = (
 )
 
 
+def raw_task(task_id="x", kind="email", split="dev"):
+    return {
+        "id": task_id, "kind": kind, "split": split, "title": "t", "persona": "p",
+        "context": "c", "instruction": "i", "max_words": 10, "forbidden": [],
+        "required_facts": [{"id": "a", "description": "d", "any_of": ["x"]}],
+    }
+
+
+def load_raw(*raws):
+    with tempfile.TemporaryDirectory() as folder:
+        Path(folder, "tasks.json").write_text(json.dumps(list(raws)))
+        return load_tasks(Path(folder))
+
+
 class TaskTests(unittest.TestCase):
     def test_seed_tasks_load(self):
         tasks = load_tasks(TASKS_DIR)
@@ -34,15 +48,22 @@ class TaskTests(unittest.TestCase):
         self.assertEqual(sum(t.kind == "takehome" for t in tasks.values()), 5)
 
     def test_rejects_bad_kind(self):
-        raw = {
-            "id": "x", "kind": "poem", "title": "t", "persona": "p", "context": "c",
-            "instruction": "i", "max_words": 10, "forbidden": [],
-            "required_facts": [{"id": "a", "description": "d", "any_of": ["x"]}],
-        }
-        with tempfile.TemporaryDirectory() as folder:
-            Path(folder, "bad.json").write_text(json.dumps([raw]))
-            with self.assertRaisesRegex(ValueError, "unknown kind"):
-                load_tasks(Path(folder))
+        with self.assertRaisesRegex(ValueError, "unknown kind"):
+            load_raw(raw_task(kind="poem"))
+
+    def test_rejects_bad_split(self):
+        with self.assertRaisesRegex(ValueError, "unknown split"):
+            load_raw(raw_task(split="test"))
+
+    def test_select_split(self):
+        tasks = load_raw(raw_task("a"), raw_task("b", split="heldout"))
+        self.assertEqual(set(select_split(tasks, "dev")), {"a"})
+        self.assertEqual(set(select_split(tasks, "heldout")), {"b"})
+        self.assertEqual(set(select_split(tasks, None)), {"a", "b"})
+
+    def test_select_split_rejects_empty(self):
+        with self.assertRaisesRegex(ValueError, "no tasks in split"):
+            select_split(load_raw(raw_task()), "heldout")
 
 
 class GateTests(unittest.TestCase):
@@ -156,6 +177,23 @@ class RunTests(unittest.TestCase):
         self.assertEqual(float(rows["plain"]["tell_rate"]), 0)
         self.assertGreater(float(rows["stock"]["tell_rate"]), 0)
         self.assertEqual(rows["plain"]["style_distance"], "")
+        self.assertEqual(rows["plain"]["split"], "dev")
+
+    def test_score_split_leaves_out_other_tasks(self):
+        raw = json.loads((TASKS_DIR / "email.json").read_text("utf-8"))
+        for task in raw:
+            if task["id"] == "email-02-slip":
+                task["split"] = "heldout"
+        tasks_dir = Path(self.folder.name, "tasks")
+        tasks_dir.mkdir()
+        (tasks_dir / "email.json").write_text(json.dumps(raw), encoding="utf-8")
+        (self.run_dir / "plain" / "email-02-slip.txt").write_text("Nov 21.", encoding="utf-8")
+        code = main(["--tasks", str(tasks_dir), "--split", "heldout", "score", str(self.run_dir)])
+        self.assertEqual(code, 0)
+        with (self.run_dir / "scores.csv").open(encoding="utf-8") as file:
+            rows = list(csv.DictReader(file))
+        self.assertEqual([(row["task_id"], row["split"]) for row in rows],
+                         [("email-02-slip", "heldout")])
 
     def test_style_distance_uses_matching_kind(self):
         human = Path(self.folder.name, "human", "email")

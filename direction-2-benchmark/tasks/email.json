@@ -2,6 +2,7 @@
   {
     "id": "email-01-reschedule",
     "kind": "email",
+    "split": "dev",
     "title": "Move a technical interview",
     "persona": "You are Sam, a final-year student applying for a backend role.",
     "context": "From: Priya Nair (recruiter)\nHi Sam, we'd like to book your technical interview for Thursday at 2pm ET with Lena from the platform team. Can you confirm that works?\n\nFacts for your reply: You have an exam on Thursday afternoon. You are free Friday after 1pm or Monday morning.",
@@ -19,6 +20,7 @@
   {
     "id": "email-02-slip",
     "kind": "email",
+    "split": "dev",
     "title": "Tell a client a date slipped",
     "persona": "You are Jordan, an engineer at a small agency.",
     "context": "From: Mei Tanaka (client)\nHi Jordan, are we still on track for the API migration on November 14?\n\nFacts for your reply: The date moves to November 21. The vendor's sandbox was down for four days, which blocked testing. Staging will be ready for Mei's team on November 18. There is no change to the agreed price.",
@@ -37,6 +39,7 @@
   {
     "id": "email-03-decline",
     "kind": "email",
+    "split": "dev",
     "title": "Decline a job offer",
     "persona": "You are Alex, a software engineer who received two offers.",
     "context": "From: Dana Okafor (hiring manager at Northwind)\nHi Alex, the team loved meeting you. Have you had a chance to think over our offer? Happy to talk through anything.\n\nFacts for your reply: You are declining. You accepted a role elsewhere. You enjoyed the conversation with Dana's team about their search infrastructure. You'd like to stay in touch.",
@@ -55,6 +58,7 @@
   {
     "id": "email-04-landlord",
     "kind": "email",
+    "split": "dev",
     "title": "Report a repair to a landlord",
     "persona": "You are Taylor, a tenant in unit 4B.",
     "context": "No thread yet. This is a new email to your landlord, Mr. Haddad.\n\nFacts to include: The dishwasher has been leaking since Sunday. Water is reaching the kitchen floor. You turned it off. A photo is attached. A repair person can come Tuesday or Wednesday after 5pm.",
@@ -73,6 +77,7 @@
   {
     "id": "email-05-review",
     "kind": "email",
+    "split": "dev",
     "title": "Push back on a teammate's pull request",
     "persona": "You are Riley, a senior engineer reviewing a teammate's work.",
     "context": "Slack-style message to Marco about PR 482.\n\nFacts to include: The new payment retry loop retries immediately, with no backoff. During last month's outage, that pattern overloaded the provider. You want exponential backoff with jitter before it merges. The rest of the PR looks good. You can pair on it Thursday.",

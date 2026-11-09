@@ -6,9 +6,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 KINDS = {"email", "takehome"}
+# Held-out tasks are for final results only. Tuning prompts or scorers on them
+# would make those results look better than they are.
+SPLITS = {"dev", "heldout"}
 REQUIRED_FIELDS = {
     "id": str,
     "kind": str,
+    "split": str,
     "title": str,
     "persona": str,
     "context": str,
@@ -33,6 +37,7 @@ class Check:
 class Task:
     id: str
     kind: str
+    split: str
     title: str
     persona: str
     context: str
@@ -66,6 +71,8 @@ def _parse_task(raw: dict) -> Task:
             raise ValueError(f"{task_id}: {field!r} must be {expected.__name__}")
     if raw["kind"] not in KINDS:
         raise ValueError(f"{task_id}: unknown kind {raw['kind']!r}")
+    if raw["split"] not in SPLITS:
+        raise ValueError(f"{task_id}: unknown split {raw['split']!r}")
     if raw["max_words"] <= 0:
         raise ValueError(f"{task_id}: max_words must be positive")
     if not raw["required_facts"]:
@@ -77,6 +84,7 @@ def _parse_task(raw: dict) -> Task:
     return Task(
         id=raw["id"],
         kind=raw["kind"],
+        split=raw["split"],
         title=raw["title"],
         persona=raw["persona"],
         context=raw["context"],
@@ -99,3 +107,13 @@ def load_tasks(directory: Path) -> dict[str, Task]:
                 raise ValueError(f"duplicate task id {task.id!r} in {path}")
             tasks[task.id] = task
     return tasks
+
+
+def select_split(tasks: dict[str, Task], split: str | None) -> dict[str, Task]:
+    """Keep only the tasks in `split`, or all of them when it is None."""
+    if split is None:
+        return tasks
+    chosen = {task_id: task for task_id, task in tasks.items() if task.split == split}
+    if not chosen:
+        raise ValueError(f"no tasks in split {split!r}")
+    return chosen

@@ -9,22 +9,37 @@ from voicebench.panel import KEY_NAME, SHEET_NAME, build_packet
 from voicebench.providers import FatalGenerationError
 from voicebench.runs import load_run
 from voicebench.scoring import load_baselines, score_output, summarize, write_scores
-from voicebench.tasks import load_tasks
+from voicebench.tasks import SPLITS, load_tasks, select_split
+
+
+def _tasks(args) -> dict:
+    return select_split(load_tasks(args.tasks), args.split)
+
+
+def _outputs(args) -> list:
+    tasks = _tasks(args)
+    # Load against every task, so outputs from the other split aren't errors.
+    outputs = [output for output in load_run(args.run, load_tasks(args.tasks))
+               if output.task.id in tasks]
+    if not outputs:
+        raise ValueError(f"no outputs in {args.run} for split {args.split!r}")
+    return outputs
 
 
 def _validate(args) -> int:
-    tasks = load_tasks(args.tasks)
+    tasks = _tasks(args)
     kinds = sorted({task.kind for task in tasks.values()})
     for kind in kinds:
-        count = sum(task.kind == kind for task in tasks.values())
-        print(f"{kind}: {count} tasks")
+        group = [task for task in tasks.values() if task.kind == kind]
+        splits = ", ".join(f"{sum(task.split == split for task in group)} {split}"
+                           for split in sorted(SPLITS))
+        print(f"{kind}: {len(group)} tasks ({splits})")
     return 0
 
 
 def _score(args) -> int:
-    tasks = load_tasks(args.tasks)
     baselines = load_baselines(args.human)
-    rows = [score_output(output, baselines) for output in load_run(args.run, tasks)]
+    rows = [score_output(output, baselines) for output in _outputs(args)]
     out = args.out or args.run / "scores.csv"
     write_scores(rows, out)
     for row in summarize(rows):
@@ -40,8 +55,7 @@ def _score(args) -> int:
 
 
 def _panel(args) -> int:
-    tasks = load_tasks(args.tasks)
-    outputs = load_run(args.run, tasks)
+    outputs = _outputs(args)
     count = build_packet(outputs, args.out, args.seed, args.include_failed)
     print(f"wrote {count} items to {args.out / SHEET_NAME}")
     print(f"keep {args.out / KEY_NAME} away from raters")
@@ -63,7 +77,7 @@ def _build_providers(names: set[str]) -> dict:
 
 
 def _generate(args) -> int:
-    tasks = load_tasks(args.tasks)
+    tasks = _tasks(args)
     conditions = load_experiment(args.experiment)
     if args.only:
         conditions = [condition for condition in conditions if condition.id in args.only]
@@ -87,6 +101,7 @@ def _generate(args) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="voicebench")
     parser.add_argument("--tasks", type=Path, default=Path("tasks"))
+    parser.add_argument("--split", choices=sorted(SPLITS), help="only use dev or held-out tasks")
     commands = parser.add_subparsers(dest="command", required=True)
 
     commands.add_parser("validate", help="check the task files").set_defaults(run_command=_validate)
