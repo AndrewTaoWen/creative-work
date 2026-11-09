@@ -104,5 +104,224 @@
     "forbidden": [
       {"id": "under_limit", "description": "Claims it stayed within the limit", "any_of": ["(within|under) the (time )?limit", "(within|under) four hours"]}
     ]
+  },
+  {
+    "id": "takehome-06-logsearch",
+    "kind": "takehome",
+    "split": "dev",
+    "title": "README for a log search tool",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: `logq`, a command-line tool in Rust for searching JSON log files. Install with `cargo install --path .`. Example: `logq app.log --level error --since 1h`. It streams files line by line, so memory stays flat on large logs. It searched a 4 GB file in about 9 seconds on your laptop. Gzipped files aren't supported yet. Windows paths are untested.",
+    "instruction": "Write the README in the candidate's own voice.",
+    "max_words": 170,
+    "required_facts": [
+      {"id": "lang", "description": "Names Rust", "any_of": ["\\brust\\b"]},
+      {"id": "install", "description": "Gives the install command", "any_of": ["cargo install"]},
+      {"id": "example", "description": "Gives an example command", "any_of": ["logq [^\\n]*--level"]},
+      {"id": "streaming", "description": "Explains line-by-line streaming", "any_of": ["stream", "line.by.line"]},
+      {"id": "perf", "description": "Gives 4 GB in about 9 seconds", "any_of": ["4 ?gb[^\\n]*(9|nine) ?(s\\b|sec)", "(9|nine) ?(s\\b|sec)[^\\n]*4 ?gb"]},
+      {"id": "gzip", "description": "Discloses no gzip support", "any_of": ["gzip", "\\.gz\\b"]},
+      {"id": "windows", "description": "Says Windows is untested", "any_of": ["windows"]}
+    ],
+    "forbidden": [
+      {"id": "cross_platform", "description": "Claims it works on Windows", "any_of": ["(works|runs|tested) on (windows|all platforms)", "cross.platform"]}
+    ]
+  },
+  {
+    "id": "takehome-07-jobqueue",
+    "kind": "takehome",
+    "split": "dev",
+    "title": "Design notes for a job queue",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Background job queue in Node.js on top of Postgres. Workers use `SELECT ... FOR UPDATE SKIP LOCKED`, so several workers can pull jobs without taking the same one. Failed jobs retry up to 5 times with exponential backoff, then move to a dead-letter table. A job can run more than once if a worker crashes after finishing it but before marking it done, so handlers must be idempotent. You picked Postgres over Redis to avoid running another service. Throughput topped out near 800 jobs per second with 4 workers in your benchmark.",
+    "instruction": "Write the design notes for the reviewer in the candidate's own voice.",
+    "max_words": 180,
+    "required_facts": [
+      {"id": "stack", "description": "Names Node.js and Postgres", "any_of": ["node[^\\n]*postgres", "postgres[^\\n]*node"]},
+      {"id": "skip_locked", "description": "Explains SKIP LOCKED", "any_of": ["skip locked"]},
+      {"id": "retries", "description": "Gives 5 retries", "any_of": ["(5|five)[^.\\n]*(retr|attempts|tries|times)", "retr[^.\\n]*(5|five)"]},
+      {"id": "backoff", "description": "Names exponential backoff", "any_of": ["backoff"]},
+      {"id": "dead_letter", "description": "Names the dead-letter table", "any_of": ["dead.letter"]},
+      {"id": "idempotent", "description": "Says handlers must be idempotent", "any_of": ["idempoten"]},
+      {"id": "why_postgres", "description": "Explains choosing Postgres over Redis", "any_of": ["redis"]},
+      {"id": "throughput", "description": "Gives about 800 jobs per second with 4 workers", "any_of": ["800[^\\n]*(4|four) workers", "(4|four) workers[^\\n]*800"]}
+    ],
+    "forbidden": [
+      {"id": "exactly_once", "description": "Claims exactly-once delivery", "any_of": ["exactly.once"]}
+    ]
+  },
+  {
+    "id": "takehome-08-churn",
+    "kind": "takehome",
+    "split": "dev",
+    "title": "Write-up for a churn model",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Churn prediction model for a subscription dataset of 48,000 customers, using LightGBM. ROC AUC is 0.81 on a held-out test set, against 0.74 for logistic regression. You split by customer and by time, so no customer appears in both train and test. The strongest features were days since last login and support tickets in the last 30 days. You dropped the `cancellation_reason` column because it's only filled in after a customer churns. The model isn't calibrated, so its scores shouldn't be read as probabilities.",
+    "instruction": "Write the write-up the reviewer reads first, in the candidate's own voice.",
+    "max_words": 180,
+    "required_facts": [
+      {"id": "model", "description": "Names LightGBM", "any_of": ["lightgbm"]},
+      {"id": "auc", "description": "Gives 0.81 against 0.74", "any_of": ["0?\\.81[^\\n]*0?\\.74", "0?\\.74[^\\n]*0?\\.81"]},
+      {"id": "split", "description": "Explains the split by customer", "any_of": ["split[^\\n]*customer", "customer[^\\n]*split", "no customer appears"]},
+      {"id": "features", "description": "Names the two strongest features", "any_of": ["last login[^\\n]*ticket", "ticket[^\\n]*last login"]},
+      {"id": "leakage", "description": "Explains dropping cancellation_reason", "any_of": ["cancellation.reason"]},
+      {"id": "calibration", "description": "Says the scores aren't calibrated", "any_of": ["calibrat"]}
+    ],
+    "forbidden": [
+      {"id": "probabilities", "description": "Calls the scores probabilities", "any_of": ["(score|output)s? (is|are) (the |a )?probabilit"]}
+    ]
+  },
+  {
+    "id": "takehome-09-loans",
+    "kind": "takehome",
+    "split": "dev",
+    "title": "README for a REST API",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: A REST API for a library's book loans, built with FastAPI and Postgres. Start everything with `docker compose up`, then open http://localhost:8000/docs for the interactive docs. Run tests with `pytest`. A loan can't be created if the member already has 5 active loans. Migrations use Alembic. Auth is a single hard-coded API key, which is fine for the exercise but not for real use. There's no pagination on the list endpoints yet.",
+    "instruction": "Write the README in the candidate's own voice.",
+    "max_words": 170,
+    "required_facts": [
+      {"id": "stack", "description": "Names FastAPI and Postgres", "any_of": ["fastapi[^\\n]*postgres", "postgres[^\\n]*fastapi"]},
+      {"id": "start", "description": "Gives the start command", "any_of": ["docker.compose up"]},
+      {"id": "docs", "description": "Gives the docs URL", "any_of": ["localhost:8000/docs"]},
+      {"id": "tests", "description": "Gives the test command", "any_of": ["pytest"]},
+      {"id": "rule", "description": "Explains the 5-loan limit", "any_of": ["(5|five)[^.\\n]*loans"]},
+      {"id": "auth", "description": "Discloses the hard-coded key", "any_of": ["hard.?coded", "single (api )?key"]},
+      {"id": "pagination", "description": "Says there's no pagination", "any_of": ["paginat"]}
+    ],
+    "forbidden": [
+      {"id": "secure", "description": "Claims it's ready for real use", "any_of": ["production.ready", "fully secure", "secure enough for production"]}
+    ]
+  },
+  {
+    "id": "takehome-10-answers",
+    "kind": "takehome",
+    "split": "dev",
+    "title": "Answers to a reviewer's questions",
+    "persona": "You are a candidate answering questions about a take-home project you submitted.",
+    "context": "The reviewer, Ana, sent questions about your take-home, an inventory service in Java with Spring Boot. Facts for your answers: 1) Why no caching? Stock levels change every few seconds, so a cache would serve stale counts. You'd add one for the product catalog first. 2) Why do two tests fail on CI? They depend on the system time zone. You've pushed a fix that pins UTC. 3) How would it scale? The bottleneck is the single Postgres writer. You'd shard by warehouse ID.",
+    "instruction": "Write the candidate's reply to Ana's questions, in the candidate's own voice.",
+    "max_words": 170,
+    "required_facts": [
+      {"id": "stale", "description": "Explains stale stock counts", "any_of": ["stale", "out of date", "outdated"]},
+      {"id": "catalog", "description": "Names the product catalog", "any_of": ["catalog"]},
+      {"id": "timezone", "description": "Names the time zone dependency", "any_of": ["time.?zone"]},
+      {"id": "utc", "description": "Says the fix pins UTC", "any_of": ["\\butc\\b"]},
+      {"id": "writer", "description": "Names the single Postgres writer", "any_of": ["(single|one)[^.\\n]*(writer|primary)", "(writer|primary)[^.\\n]*bottleneck"]},
+      {"id": "shard", "description": "Proposes sharding by warehouse", "any_of": ["shard[^\\n]*warehouse", "warehouse[^\\n]*shard", "partition[^\\n]*warehouse"]}
+    ],
+    "forbidden": [
+      {"id": "blames_ci", "description": "Blames CI instead of the tests", "any_of": ["(ci|the tests) (is|are|was|were) (just )?flaky", "all tests pass"]}
+    ]
+  },
+  {
+    "id": "takehome-11-chat",
+    "kind": "takehome",
+    "split": "heldout",
+    "title": "Design notes for a chat server",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Real-time chat server in Elixir using Phoenix Channels. Each room is its own process, so a crash in one room doesn't affect the others. Messages are saved to Postgres before they're broadcast. That adds about 15 ms of latency, but nothing is lost if the server restarts. Typing indicators are sent but never stored. You tested 2,000 concurrent connections on one machine. There's no end-to-end encryption, and messages are stored in plain text.",
+    "instruction": "Write the design notes for the reviewer in the candidate's own voice.",
+    "max_words": 170,
+    "required_facts": [
+      {"id": "stack", "description": "Names Elixir and Phoenix", "any_of": ["elixir[^\\n]*phoenix", "phoenix[^\\n]*elixir"]},
+      {"id": "process", "description": "Explains one process per room", "any_of": ["(process|genserver)[^.\\n]*room", "room[^.\\n]*(process|genserver)"]},
+      {"id": "persist", "description": "Explains saving before broadcasting", "any_of": ["(sav|stor|writ|persist)[^.\\n]*before[^.\\n]*broadcast", "broadcast[^.\\n]*after[^.\\n]*(sav|stor|writ|persist)"]},
+      {"id": "latency", "description": "Gives about 15 ms", "any_of": ["15 ?ms"]},
+      {"id": "typing", "description": "Says typing indicators aren't stored", "any_of": ["typing"]},
+      {"id": "load", "description": "Gives 2,000 connections", "any_of": ["2,?000[^\\n]*connection", "connection[^\\n]*2,?000"]},
+      {"id": "encryption", "description": "Discloses no end-to-end encryption", "any_of": ["encrypt"]}
+    ],
+    "forbidden": [
+      {"id": "encrypted", "description": "Claims messages are encrypted", "any_of": ["(is|are) end.to.end encrypted", "fully encrypted"]}
+    ]
+  },
+  {
+    "id": "takehome-12-expenses",
+    "kind": "takehome",
+    "split": "heldout",
+    "title": "README for a mobile app",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Expense tracker app in React Native with Expo. Run it with `npx expo start` and scan the QR code with the Expo Go app. Data is stored on the device with SQLite, so it works offline. Receipt photos are compressed to under 500 KB before saving. You tested on an iPhone 13 and a Pixel 7. Android back-button handling on the edit screen is buggy. There's no cloud sync.",
+    "instruction": "Write the README in the candidate's own voice.",
+    "max_words": 160,
+    "required_facts": [
+      {"id": "stack", "description": "Names React Native and Expo", "any_of": ["react native[^\\n]*expo", "expo[^\\n]*react native"]},
+      {"id": "run", "description": "Gives the run command", "any_of": ["npx expo start"]},
+      {"id": "storage", "description": "Names on-device SQLite", "any_of": ["sqlite"]},
+      {"id": "offline", "description": "Says it works offline", "any_of": ["offline"]},
+      {"id": "photos", "description": "Gives the 500 KB limit", "any_of": ["500 ?kb"]},
+      {"id": "devices", "description": "Names the test devices", "any_of": ["iphone 13[^\\n]*pixel 7", "pixel 7[^\\n]*iphone 13"]},
+      {"id": "bug", "description": "Discloses the back-button bug", "any_of": ["back.button"]},
+      {"id": "sync", "description": "Says there's no cloud sync", "any_of": ["sync"]}
+    ],
+    "forbidden": [
+      {"id": "tested_all", "description": "Claims it was tested everywhere", "any_of": ["(works|tested) on (all|every) (devices|phones)", "fully tested"]}
+    ]
+  },
+  {
+    "id": "takehome-13-bikeshare",
+    "kind": "takehome",
+    "split": "heldout",
+    "title": "Summary of a data analysis",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Analysis of a bike-share dataset of 1.3 million trips in 2023, in a Jupyter notebook with pandas. Weekday ridership peaks at 8am and 5pm. Weekend ridership peaks around 2pm. Members take shorter trips than casual riders, with a median of 11 minutes against 19. Rainy days had about 40% fewer trips, but you only matched weather for 280 of the 365 days. You can't say whether rain causes the drop, only that they move together. The notebook runs top to bottom in about 3 minutes.",
+    "instruction": "Write the summary the reviewer reads first, in the candidate's own voice.",
+    "max_words": 170,
+    "required_facts": [
+      {"id": "data", "description": "Gives 1.3 million trips", "any_of": ["1\\.3 ?(m\\b|million)"]},
+      {"id": "weekday", "description": "Gives the 8am and 5pm weekday peaks", "any_of": ["8 ?am[^\\n]*5 ?pm", "5 ?pm[^\\n]*8 ?am"]},
+      {"id": "weekend", "description": "Gives the 2pm weekend peak", "any_of": ["weekend[^\\n]*2 ?pm", "2 ?pm[^\\n]*weekend"]},
+      {"id": "median", "description": "Gives 11 against 19 minutes", "any_of": ["\\b11\\b[^\\n]*\\b19\\b", "\\b19\\b[^\\n]*\\b11\\b"]},
+      {"id": "rain", "description": "Gives about 40% fewer trips", "any_of": ["40 ?%", "40 percent"]},
+      {"id": "coverage", "description": "Says weather matched 280 of 365 days", "any_of": ["\\b280\\b"]},
+      {"id": "causation", "description": "Says it isn't proven causation", "any_of": ["caus", "correlat"]}
+    ],
+    "forbidden": [
+      {"id": "causal_claim", "description": "Claims rain causes the drop", "any_of": ["proves? (that )?rain", "rain (directly )?(reduces|drives|caused)"]}
+    ]
+  },
+  {
+    "id": "takehome-14-pricecache",
+    "kind": "takehome",
+    "split": "heldout",
+    "title": "Write-up for a caching layer",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Read-through cache in Go in front of a slow pricing API. Entries expire after 60 seconds. Concurrent requests for the same key are collapsed into one upstream call with singleflight. The cache is in memory per instance, so two instances can briefly return different prices. p95 latency dropped from 420 ms to 35 ms in your load test with 200 users. Cache invalidation on price changes isn't implemented, so prices can be up to 60 seconds stale.",
+    "instruction": "Write the write-up the reviewer reads first, in the candidate's own voice.",
+    "max_words": 160,
+    "required_facts": [
+      {"id": "lang", "description": "Names Go", "any_of": ["\\bgo\\b", "golang"]},
+      {"id": "ttl", "description": "Gives the 60-second expiry", "any_of": ["60 ?(s\\b|sec)"]},
+      {"id": "singleflight", "description": "Explains request collapsing with singleflight", "any_of": ["single.?flight"]},
+      {"id": "per_instance", "description": "Says the cache is per instance", "any_of": ["per.instance", "each instance", "in.memory"]},
+      {"id": "latency", "description": "Gives 420 ms to 35 ms", "any_of": ["420[^\\n]*35", "35[^\\n]*420"]},
+      {"id": "invalidation", "description": "Says invalidation isn't implemented", "any_of": ["invalidat"]},
+      {"id": "stale", "description": "Says prices can be stale", "any_of": ["stale"]}
+    ],
+    "forbidden": [
+      {"id": "consistent", "description": "Claims prices are always fresh", "any_of": ["always (consistent|fresh|up to date)", "strongly consistent"]}
+    ]
+  },
+  {
+    "id": "takehome-15-unfinished",
+    "kind": "takehome",
+    "split": "heldout",
+    "title": "Submission note for an unfinished take-home",
+    "persona": "You are a candidate sending in a take-home you didn't finish.",
+    "context": "Send this to Maya, the engineering lead. Facts: The repo is at https://example.com/booking. The task was a booking system with an API, a calendar UI and email reminders. The API and calendar UI are done and tested. Email reminders aren't done, because you ran out of time at the 3-hour limit. You've written in NOTES.md how you'd build them with a scheduled job. You'd be glad to talk through the gaps.",
+    "instruction": "Write the short submission email in the candidate's own voice.",
+    "max_words": 110,
+    "required_facts": [
+      {"id": "link", "description": "Includes the repo link", "any_of": ["https://example\\.com/booking"]},
+      {"id": "done", "description": "Says the API and calendar are done", "any_of": ["(api|calendar)[^.\\n]*(done|finished|complete|working)", "(done|finished|completed)[^.\\n]*(api|calendar)"]},
+      {"id": "missing", "description": "Says reminders aren't done", "any_of": ["reminder"]},
+      {"id": "time", "description": "Gives the 3-hour limit", "any_of": ["(3|three)[^.\\n]*hour"]},
+      {"id": "notes", "description": "Points to NOTES.md", "any_of": ["notes\\.md"]},
+      {"id": "talk", "description": "Offers to talk through the gaps", "any_of": ["(talk|walk|go) (through|over)", "discuss", "\\bchat\\b"]}
+    ],
+    "forbidden": [
+      {"id": "complete", "description": "Claims everything is finished", "any_of": ["(everything|all of it|the whole (thing|task)) (is )?(done|finished|complete)", "fully (done|complete)"]}
+    ]
   }
 ]
