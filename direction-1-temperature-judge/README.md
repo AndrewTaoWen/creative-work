@@ -25,6 +25,8 @@ python3 -m voicebench generate ../direction-1-temperature-judge/experiments/firs
 
 Use the same `--run` folder as Direction 2. The decision rule compares the sweep with the gap between `opus-default` and `opus-few-shot`, and those two conditions come from Direction 2.
 
+While you're still adjusting the judge, add `--split dev` before `generate`, and keep the held-out tasks for the final comparison. Direction 2 explains the [split](../direction-2-benchmark/README.md#dev-and-held-out-tasks).
+
 ## The judge
 
 The only judge so far is `select_draft` in `voicebench/generate.py`. It picks a draft that passes the gate, then takes the lowest tell rate. Because the tell list isn't calibrated, treat `opus-best-of-8` as a test of this selection rule, not of selection in general.

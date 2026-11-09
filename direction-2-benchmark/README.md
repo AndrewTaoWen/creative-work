@@ -10,7 +10,7 @@ pip install -r requirements.txt
 
 ## Layout
 
-- `tasks/`: benchmark tasks. There are 5 email tasks and 5 take-home tasks so far.
+- `tasks/`: benchmark tasks. There are 15 email tasks and 15 take-home tasks. For each kind, 10 are dev tasks and 5 are held out.
 - `experiments/`: the conditions to compare.
 - `voicebench/`: the generation and scoring tools, also used by [Direction 1](../direction-1-temperature-judge/README.md).
 - `tests/`: unit tests and fixtures.
@@ -56,6 +56,19 @@ Run the tests:
 ```bash
 python3 -m unittest discover -s tests
 ```
+
+## Dev and held-out tasks
+
+Each task is either `dev` or `heldout`. Use dev tasks while you try prompts or adjust the scorers. Keep the held-out tasks for final results, because anything tuned on a task looks better on it than it really is. Held out means not used for tuning. It doesn't mean secret, since the tasks are in this repo.
+
+`--split` goes before the command and works with all of them:
+
+```bash
+python3 -m voicebench --split dev generate experiments/first.json --run runs/first
+python3 -m voicebench --split heldout score runs/first --human data/human
+```
+
+With `--split`, `score` and `panel` skip outputs for tasks in the other split. `scores.csv` records each output's split.
 
 ## Scores
 
