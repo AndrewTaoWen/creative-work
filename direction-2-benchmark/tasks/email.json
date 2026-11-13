@@ -1,0 +1,90 @@
+[
+  {
+    "id": "email-01-reschedule",
+    "kind": "email",
+    "title": "Move a technical interview",
+    "persona": "You are Sam, a final-year student applying for a backend role.",
+    "context": "From: Priya Nair (recruiter)\nHi Sam, we'd like to book your technical interview for Thursday at 2pm ET with Lena from the platform team. Can you confirm that works?\n\nFacts for your reply: You have an exam on Thursday afternoon. You are free Friday after 1pm or Monday morning.",
+    "instruction": "Write Sam's reply to Priya.",
+    "max_words": 90,
+    "required_facts": [
+      {"id": "conflict", "description": "Says Thursday doesn't work", "any_of": ["thursday[^.?!]*(exam|can'?t|cannot|won'?t work|doesn'?t work|conflict|unavailable)", "(exam|can'?t|cannot|conflict|unavailable)[^.?!]*thursday"]},
+      {"id": "friday", "description": "Offers Friday after 1pm", "any_of": ["friday[^.?!]*(after|from|past) ?1", "friday[^.?!]*afternoon"]},
+      {"id": "monday", "description": "Offers Monday morning", "any_of": ["monday[^.?!]*(morning|am\\b)", "morning[^.?!]*monday"]}
+    ],
+    "forbidden": [
+      {"id": "accepts_thursday", "description": "Accepts the Thursday slot", "any_of": ["see you (on )?thursday", "thursday (works|is fine|is great)"]}
+    ]
+  },
+  {
+    "id": "email-02-slip",
+    "kind": "email",
+    "title": "Tell a client a date slipped",
+    "persona": "You are Jordan, an engineer at a small agency.",
+    "context": "From: Mei Tanaka (client)\nHi Jordan, are we still on track for the API migration on November 14?\n\nFacts for your reply: The date moves to November 21. The vendor's sandbox was down for four days, which blocked testing. Staging will be ready for Mei's team on November 18. There is no change to the agreed price.",
+    "instruction": "Write Jordan's reply to Mei.",
+    "max_words": 110,
+    "required_facts": [
+      {"id": "new_date", "description": "Gives November 21", "any_of": ["(nov(ember)?\\.? ?21)", "21(st)?( of)? nov"]},
+      {"id": "cause", "description": "Names the sandbox outage", "any_of": ["sandbox"]},
+      {"id": "staging", "description": "Gives the November 18 staging date", "any_of": ["(nov(ember)?\\.? ?18)", "18(th)?( of)? nov"]},
+      {"id": "price", "description": "Says the price is unchanged", "any_of": ["(price|cost|fee|budget|quote)[^.?!]*(same|unchanged|change|stays|won'?t|doesn'?t|not)", "(no|without)[^.?!]*(change|impact|increase)[^.?!]*(price|cost|fee|budget|quote)"]}
+    ],
+    "forbidden": [
+      {"id": "on_track", "description": "Claims the original date still holds", "any_of": ["still on track", "on schedule"]}
+    ]
+  },
+  {
+    "id": "email-03-decline",
+    "kind": "email",
+    "title": "Decline a job offer",
+    "persona": "You are Alex, a software engineer who received two offers.",
+    "context": "From: Dana Okafor (hiring manager at Northwind)\nHi Alex, the team loved meeting you. Have you had a chance to think over our offer? Happy to talk through anything.\n\nFacts for your reply: You are declining. You accepted a role elsewhere. You enjoyed the conversation with Dana's team about their search infrastructure. You'd like to stay in touch.",
+    "instruction": "Write Alex's reply to Dana.",
+    "max_words": 90,
+    "required_facts": [
+      {"id": "decline", "description": "Clearly declines", "any_of": ["declin", "turn(ing)? (it |this |the offer )?down", "(won'?t|will not|not) be (accepting|joining|taking)", "pass(ing)? on"]},
+      {"id": "elsewhere", "description": "Says they accepted another role", "any_of": ["accepted[^.?!]*(role|offer|position|job)", "(another|different|other) (role|offer|position|job|company|team)"]},
+      {"id": "search", "description": "Mentions the search infrastructure conversation", "any_of": ["search"]},
+      {"id": "in_touch", "description": "Offers to stay in touch", "any_of": ["(stay|keep|be) in touch", "keep up", "cross paths", "connected"]}
+    ],
+    "forbidden": [
+      {"id": "accepts", "description": "Accepts the offer", "any_of": ["excited to (join|accept)", "i accept (your|the) offer"]}
+    ]
+  },
+  {
+    "id": "email-04-landlord",
+    "kind": "email",
+    "title": "Report a repair to a landlord",
+    "persona": "You are Taylor, a tenant in unit 4B.",
+    "context": "No thread yet. This is a new email to your landlord, Mr. Haddad.\n\nFacts to include: The dishwasher has been leaking since Sunday. Water is reaching the kitchen floor. You turned it off. A photo is attached. A repair person can come Tuesday or Wednesday after 5pm.",
+    "instruction": "Write Taylor's email to Mr. Haddad, including a subject line.",
+    "max_words": 90,
+    "required_facts": [
+      {"id": "unit", "description": "Gives the unit", "any_of": ["4b"]},
+      {"id": "leak", "description": "Says the dishwasher is leaking", "any_of": ["dishwasher[^.?!]*leak", "leak[^.?!]*dishwasher"]},
+      {"id": "since", "description": "Says it began Sunday", "any_of": ["sunday"]},
+      {"id": "off", "description": "Says it was turned off", "any_of": ["(turned|shut|switched)[^.?!]*off", "(stopped|not) using"]},
+      {"id": "photo", "description": "Mentions the photo", "any_of": ["photo", "picture"]},
+      {"id": "access", "description": "Gives Tuesday or Wednesday after 5pm", "any_of": ["tuesday[^.?!]*wednesday[^.?!]*(after|from|past) ?5", "(tues|wednes)day[^.?!]*evening", "after 5[^.?!]*tuesday"]}
+    ],
+    "forbidden": []
+  },
+  {
+    "id": "email-05-review",
+    "kind": "email",
+    "title": "Push back on a teammate's pull request",
+    "persona": "You are Riley, a senior engineer reviewing a teammate's work.",
+    "context": "Slack-style message to Marco about PR 482.\n\nFacts to include: The new payment retry loop retries immediately, with no backoff. During last month's outage, that pattern overloaded the provider. You want exponential backoff with jitter before it merges. The rest of the PR looks good. You can pair on it Thursday.",
+    "instruction": "Write Riley's message to Marco.",
+    "max_words": 80,
+    "required_facts": [
+      {"id": "problem", "description": "Names the immediate retry problem", "any_of": ["(retr(y|ies)|loop)[^.?!]*(immediate|no backoff|without backoff|right away|straight away)", "(immediate|no backoff)[^.?!]*retr"]},
+      {"id": "outage", "description": "Refers to last month's outage", "any_of": ["outage"]},
+      {"id": "fix", "description": "Asks for exponential backoff with jitter", "any_of": ["exponential[^.?!]*jitter", "jitter[^.?!]*exponential"]},
+      {"id": "blocker", "description": "Says this must happen before merging", "any_of": ["before[^.?!]*merg", "block", "hold off"]},
+      {"id": "pair", "description": "Offers to pair Thursday", "any_of": ["pair[^.?!]*thursday", "thursday[^.?!]*pair"]}
+    ],
+    "forbidden": []
+  }
+]

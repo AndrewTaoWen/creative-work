@@ -1,0 +1,103 @@
+[
+  {
+    "id": "takehome-01-shortener",
+    "kind": "takehome",
+    "title": "README for a URL shortener",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: URL shortener in Go with SQLite. Short codes are random base62 strings, 7 characters long. A collision retries up to three times, then returns a 500. Start with `make run`. Test with `make test`. There is no authentication and no rate limiting. There are no load tests.",
+    "instruction": "Write the README in the candidate's own voice. Cover how to run it, the main design choice, and what is missing.",
+    "max_words": 180,
+    "required_facts": [
+      {"id": "stack", "description": "Names Go and SQLite", "any_of": ["\\bgo\\b[^\\n]*sqlite", "sqlite[^\\n]*\\bgo\\b"]},
+      {"id": "run", "description": "Gives the run command", "any_of": ["make run"]},
+      {"id": "test", "description": "Gives the test command", "any_of": ["make test"]},
+      {"id": "codes", "description": "Explains random base62 codes", "any_of": ["base-?62"]},
+      {"id": "collision", "description": "Explains the three retries", "any_of": ["(three|3)[^.\\n]*(retr|tries|attempts|times)", "retr[^.\\n]*(three|3)"]},
+      {"id": "missing", "description": "Says there is no auth or rate limiting", "any_of": ["(no|without|n'?t have|missing|skipped)[^.\\n]*(auth|rate.?limit)", "(auth|rate.?limit)[^.\\n]*(missing|not (implemented|included|done)|skipped|out of scope)"]}
+    ],
+    "forbidden": [
+      {"id": "production", "description": "Claims it is production-ready", "any_of": ["production.ready"]},
+      {"id": "load_tested", "description": "Claims it was load tested", "any_of": ["load.tested", "handles? [0-9,k]+ ?(requests|rps)"]}
+    ]
+  },
+  {
+    "id": "takehome-02-limiter",
+    "kind": "takehome",
+    "title": "Design notes for a rate limiter",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Token bucket rate limiter in Python backed by Redis, using a Lua script so that each check is atomic. Limit is 100 requests per minute per API key. If Redis is down, requests are allowed through (fail open). You chose this so that a Redis outage doesn't take down the API, but it means limits aren't enforced during one. It took about five hours. Clock skew between app servers isn't handled because the script uses Redis time.",
+    "instruction": "Write the design notes for the reviewer in the candidate's own voice.",
+    "max_words": 170,
+    "required_facts": [
+      {"id": "algo", "description": "Names the token bucket", "any_of": ["token.bucket"]},
+      {"id": "atomic", "description": "Explains the atomic Lua script", "any_of": ["lua[^.\\n]*atomic", "atomic[^.\\n]*lua"]},
+      {"id": "limit", "description": "States 100 per minute per key", "any_of": ["100[^.\\n]*(minute|min\\b)"]},
+      {"id": "fail_open", "description": "Says it fails open", "any_of": ["fail(s|ing)?.open", "(allow|let)[^.\\n]*(through|requests)[^.\\n]*redis", "redis[^.\\n]*(allow|let)[^.\\n]*(through|requests)"]},
+      {"id": "tradeoff", "description": "States the downside of failing open", "any_of": ["(limits?|limiting)[^.\\n]*(n'?t|not|un)[^.\\n]*enforc", "(no|without)[^.\\n]*(limit|enforcement)[^.\\n]*(outage|down)", "unlimited"]},
+      {"id": "time", "description": "Says it took about five hours", "any_of": ["(five|5)[^.\\n]*(hour|hrs?\\b)"]}
+    ],
+    "forbidden": [
+      {"id": "fail_closed", "description": "Claims requests are rejected when Redis is down", "any_of": ["fails? closed"]}
+    ]
+  },
+  {
+    "id": "takehome-03-ingest",
+    "kind": "takehome",
+    "title": "Summary of a CSV ingestion pipeline",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Python and DuckDB pipeline for an orders CSV. It processed 2.1 million rows in 38 seconds on your laptop. Duplicates are removed by order_id, keeping the latest updated_at. 1,204 malformed rows go to quarantine.csv and aren't dropped silently. One known bug: rows with non-UTF-8 names fail the whole run. It has not been run on the full production-sized file.",
+    "instruction": "Write the write-up the reviewer reads first, in the candidate's own voice.",
+    "max_words": 150,
+    "required_facts": [
+      {"id": "stack", "description": "Names DuckDB", "any_of": ["duckdb"]},
+      {"id": "speed", "description": "Gives rows and time", "any_of": ["2\\.1[^.\\n]*(m\\b|million)[^\\n]*38", "38[^\\n]*2\\.1 ?(m\\b|million)"]},
+      {"id": "laptop", "description": "Says the timing was on a laptop", "any_of": ["laptop"]},
+      {"id": "dedupe", "description": "Explains the dedupe rule", "any_of": ["order_id[^\\n]*(latest|newest|most recent|updated_at)", "(latest|newest|most recent|updated_at)[^\\n]*order_id"]},
+      {"id": "quarantine", "description": "Reports 1,204 quarantined rows", "any_of": ["1,?204"]},
+      {"id": "bug", "description": "Discloses the non-UTF-8 failure", "any_of": ["(non-?utf|utf-?8|encoding)"]}
+    ],
+    "forbidden": [
+      {"id": "full_file", "description": "Claims it ran on the full production file", "any_of": ["full production (file|data)[^.\\n]*(ran|tested|processed|handled)", "(ran|tested|processed|handled)[^.\\n]*full production (file|data)"]}
+    ]
+  },
+  {
+    "id": "takehome-04-kanban",
+    "kind": "takehome",
+    "title": "README for a Kanban board",
+    "persona": "You are a candidate submitting a take-home project.",
+    "context": "Project facts: Kanban board in React and TypeScript. State lives in Zustand. Drag and drop uses dnd-kit. Card moves update the UI optimistically and roll back if the API call fails. Start with `npm run dev`. Keyboard dragging doesn't work yet. There is no offline support. If you had more time, you would do keyboard dragging first.",
+    "instruction": "Write the README in the candidate's own voice.",
+    "max_words": 160,
+    "required_facts": [
+      {"id": "stack", "description": "Names React and TypeScript", "any_of": ["react[^\\n]*typescript", "typescript[^\\n]*react"]},
+      {"id": "state", "description": "Names Zustand", "any_of": ["zustand"]},
+      {"id": "dnd", "description": "Names dnd-kit", "any_of": ["dnd.?kit"]},
+      {"id": "run", "description": "Gives the run command", "any_of": ["npm run dev"]},
+      {"id": "optimistic", "description": "Explains optimistic updates with rollback", "any_of": ["optimistic[^\\n]*(roll|revert|undo)", "(roll|revert|undo)[^\\n]*optimistic"]},
+      {"id": "keyboard", "description": "Discloses the keyboard gap", "any_of": ["keyboard"]},
+      {"id": "offline", "description": "Discloses no offline support", "any_of": ["offline"]}
+    ],
+    "forbidden": [
+      {"id": "accessible", "description": "Claims it is fully accessible", "any_of": ["fully accessible", "wcag"]}
+    ]
+  },
+  {
+    "id": "takehome-05-cover",
+    "kind": "takehome",
+    "title": "Submission note to a hiring manager",
+    "persona": "You are a candidate sending in a finished take-home.",
+    "context": "Send this to Ben, the hiring manager. Facts: The repo link is https://example.com/repo. The suggested limit was four hours and you spent six. You went over because of the search index rewrite. You skipped the admin dashboard. You used an AI assistant for test scaffolding, and the instructions allow this if disclosed.",
+    "instruction": "Write the short submission email in the candidate's own voice.",
+    "max_words": 100,
+    "required_facts": [
+      {"id": "link", "description": "Includes the repo link", "any_of": ["https://example\\.com/repo"]},
+      {"id": "time", "description": "Says six hours against the four-hour limit", "any_of": ["(six|6)[^.\\n]*(hour|hrs?\\b)[^\\n]*(four|4)", "(four|4)[^\\n]*(six|6)[^.\\n]*(hour|hrs?\\b)"]},
+      {"id": "why", "description": "Gives the search index reason", "any_of": ["search"]},
+      {"id": "skipped", "description": "Says the admin dashboard was skipped", "any_of": ["admin"]},
+      {"id": "ai", "description": "Discloses AI use for test scaffolding", "any_of": ["(ai|assistant|copilot|claude|chatgpt|llm)[^\\n]*(test|scaffold)", "(test|scaffold)[^\\n]*(\\bai\\b|assistant|copilot|claude|chatgpt|llm)"]}
+    ],
+    "forbidden": [
+      {"id": "under_limit", "description": "Claims it stayed within the limit", "any_of": ["(within|under) the (time )?limit", "(within|under) four hours"]}
+    ]
+  }
+]
