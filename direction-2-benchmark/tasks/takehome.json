@@ -2,6 +2,7 @@
   {
     "id": "takehome-01-shortener",
     "kind": "takehome",
+    "split": "dev",
     "title": "README for a URL shortener",
     "persona": "You are a candidate submitting a take-home project.",
     "context": "Project facts: URL shortener in Go with SQLite. Short codes are random base62 strings, 7 characters long. A collision retries up to three times, then returns a 500. Start with `make run`. Test with `make test`. There is no authentication and no rate limiting. There are no load tests.",
@@ -23,6 +24,7 @@
   {
     "id": "takehome-02-limiter",
     "kind": "takehome",
+    "split": "dev",
     "title": "Design notes for a rate limiter",
     "persona": "You are a candidate submitting a take-home project.",
     "context": "Project facts: Token bucket rate limiter in Python backed by Redis, using a Lua script so that each check is atomic. Limit is 100 requests per minute per API key. If Redis is down, requests are allowed through (fail open). You chose this so that a Redis outage doesn't take down the API, but it means limits aren't enforced during one. It took about five hours. Clock skew between app servers isn't handled because the script uses Redis time.",
@@ -43,6 +45,7 @@
   {
     "id": "takehome-03-ingest",
     "kind": "takehome",
+    "split": "dev",
     "title": "Summary of a CSV ingestion pipeline",
     "persona": "You are a candidate submitting a take-home project.",
     "context": "Project facts: Python and DuckDB pipeline for an orders CSV. It processed 2.1 million rows in 38 seconds on your laptop. Duplicates are removed by order_id, keeping the latest updated_at. 1,204 malformed rows go to quarantine.csv and aren't dropped silently. One known bug: rows with non-UTF-8 names fail the whole run. It has not been run on the full production-sized file.",
@@ -63,6 +66,7 @@
   {
     "id": "takehome-04-kanban",
     "kind": "takehome",
+    "split": "dev",
     "title": "README for a Kanban board",
     "persona": "You are a candidate submitting a take-home project.",
     "context": "Project facts: Kanban board in React and TypeScript. State lives in Zustand. Drag and drop uses dnd-kit. Card moves update the UI optimistically and roll back if the API call fails. Start with `npm run dev`. Keyboard dragging doesn't work yet. There is no offline support. If you had more time, you would do keyboard dragging first.",
@@ -84,6 +88,7 @@
   {
     "id": "takehome-05-cover",
     "kind": "takehome",
+    "split": "dev",
     "title": "Submission note to a hiring manager",
     "persona": "You are a candidate sending in a finished take-home.",
     "context": "Send this to Ben, the hiring manager. Facts: The repo link is https://example.com/repo. The suggested limit was four hours and you spent six. You went over because of the search index rewrite. You skipped the admin dashboard. You used an AI assistant for test scaffolding, and the instructions allow this if disclosed.",
