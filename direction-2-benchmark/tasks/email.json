@@ -91,5 +91,212 @@
       {"id": "pair", "description": "Offers to pair Thursday", "any_of": ["pair[^.?!]*thursday", "thursday[^.?!]*pair"]}
     ],
     "forbidden": []
+  },
+  {
+    "id": "email-06-extension",
+    "kind": "email",
+    "split": "dev",
+    "title": "Ask a professor for an extension",
+    "persona": "You are Morgan, a third-year computer science student.",
+    "context": "No thread yet. This is a new email to Professor Ruiz, who teaches CS 341 (Operating Systems).\n\nFacts to include: Project 3 is due Friday at 11:59pm. You had the flu and missed four days this week. You have a note from campus health. You are asking to submit by Tuesday instead. The scheduler part is done. The memory allocator part isn't.",
+    "instruction": "Write Morgan's email to Professor Ruiz, including a subject line.",
+    "max_words": 110,
+    "required_facts": [
+      {"id": "course", "description": "Names CS 341", "any_of": ["341"]},
+      {"id": "project", "description": "Names Project 3", "any_of": ["project (3|three)"]},
+      {"id": "reason", "description": "Says they had the flu", "any_of": ["\\bflu\\b", "\\bsick\\b", "\\bill\\b"]},
+      {"id": "note", "description": "Mentions the campus health note", "any_of": ["campus health", "health (center|centre|services)", "doctor'?s note", "medical (note|documentation)"]},
+      {"id": "new_date", "description": "Asks for Tuesday", "any_of": ["tuesday"]},
+      {"id": "progress", "description": "Says the scheduler is done", "any_of": ["scheduler[^.?!]*(done|finished|complete|working)", "(done|finished|completed)[^.?!]*scheduler"]}
+    ],
+    "forbidden": [
+      {"id": "all_done", "description": "Claims the allocator is finished", "any_of": ["allocator(?: part)? (is|'s) (done|finished|complete|working)", "(both|all) parts are (done|finished|complete)"]}
+    ]
+  },
+  {
+    "id": "email-07-followup",
+    "kind": "email",
+    "split": "dev",
+    "title": "Follow up after hearing nothing",
+    "persona": "You are Chris, a data analyst who interviewed for a job.",
+    "context": "No reply yet. This is a follow-up email to Hannah Lee, the recruiter at Brightline.\n\nFacts to include: You had the final interview on October 20. Hannah said you'd hear back within a week. It has now been two weeks. You have another offer with a deadline of November 12. You would prefer Brightline.",
+    "instruction": "Write Chris's follow-up email to Hannah.",
+    "max_words": 90,
+    "required_facts": [
+      {"id": "interview", "description": "Refers to the October 20 interview", "any_of": ["oct(ober)?\\.? ?20", "20(th)?( of)? oct"]},
+      {"id": "other_offer", "description": "Mentions the other offer", "any_of": ["(another|other|competing|second) offer", "offer (from|elsewhere)"]},
+      {"id": "deadline", "description": "Gives the November 12 deadline", "any_of": ["nov(ember)?\\.? ?12", "12(th)?( of)? nov"]},
+      {"id": "preference", "description": "Says Brightline is the preference", "any_of": ["prefer", "(first|top) choice", "(really|would) (like|love) to (join|work)", "rather (join|work|be)"]}
+    ],
+    "forbidden": [
+      {"id": "ultimatum", "description": "Threatens to take the other offer", "any_of": ["i('ll| will) (have to )?accept (the|their) (other )?offer", "or i('ll| will) (take|accept)"]}
+    ]
+  },
+  {
+    "id": "email-08-support",
+    "kind": "email",
+    "split": "dev",
+    "title": "Answer an angry customer about a double charge",
+    "persona": "You are Jamie, who handles support at a small software company.",
+    "context": "From: Omar Siddiqui (customer)\nI was charged twice for my November subscription. Fix this now or I'm cancelling.\n\nFacts for your reply: You confirmed the duplicate charge of $29. You refunded it today. Refunds take 5 to 10 business days to appear. The cause was a retry bug in your billing system, and it is now fixed. You can't offer a free month. His subscription stays active unless he says otherwise.",
+    "instruction": "Write Jamie's reply to Omar.",
+    "max_words": 100,
+    "required_facts": [
+      {"id": "confirm", "description": "Confirms the duplicate charge", "any_of": ["(charged|billed) (you )?twice", "duplicate", "double.?charge", "(second|extra) charge"]},
+      {"id": "amount", "description": "Gives the $29 amount", "any_of": ["\\$ ?29\\b"]},
+      {"id": "refunded", "description": "Says it has been refunded", "any_of": ["refund"]},
+      {"id": "timing", "description": "Gives 5 to 10 business days", "any_of": ["5 ?(to|-|–) ?10[^.?!]*days", "five to ten[^.?!]*days"]},
+      {"id": "cause", "description": "Says the billing bug is fixed", "any_of": ["(bug|glitch|error|issue)[^.?!]*(fixed|resolved|patched)", "(fixed|resolved|patched)[^.?!]*(bug|glitch|error|issue)"]}
+    ],
+    "forbidden": [
+      {"id": "free_month", "description": "Offers a free month", "any_of": ["free month", "month (free|on us)", "(free|complimentary) (month|credit)"]},
+      {"id": "instant", "description": "Promises the money back today", "any_of": ["(back|appear|see it)[^.?!]*today"]}
+    ]
+  },
+  {
+    "id": "email-09-oncall",
+    "kind": "email",
+    "split": "dev",
+    "title": "Ask a teammate to swap on-call weeks",
+    "persona": "You are Devon, a site reliability engineer.",
+    "context": "Message in the team's on-call channel to Aisha.\n\nFacts to include: You are on call the week of December 8. Your sister's wedding is on December 13, out of town. You're asking Aisha to swap weeks. You would take her week of December 22 in return. Your manager, Tom, has already said the swap is fine.",
+    "instruction": "Write Devon's message to Aisha.",
+    "max_words": 70,
+    "required_facts": [
+      {"id": "week", "description": "Gives the week of December 8", "any_of": ["dec(ember)?\\.? ?8\\b", "\\b8(th)? (of )?dec"]},
+      {"id": "reason", "description": "Gives the wedding as the reason", "any_of": ["wedding"]},
+      {"id": "swap", "description": "Asks to swap", "any_of": ["swap", "trade", "switch"]},
+      {"id": "return", "description": "Offers to take December 22", "any_of": ["dec(ember)?\\.? ?22", "22(nd)? (of )?dec"]},
+      {"id": "manager", "description": "Says Tom already approved", "any_of": ["\\btom\\b"]}
+    ],
+    "forbidden": [
+      {"id": "wrong_week", "description": "Offers the wrong return week", "any_of": ["dec(ember)?\\.? ?15", "15(th)? (of )?dec"]}
+    ]
+  },
+  {
+    "id": "email-10-negotiate",
+    "kind": "email",
+    "split": "dev",
+    "title": "Negotiate a job offer",
+    "persona": "You are Sasha, a software engineer with a job offer.",
+    "context": "From: Leo Brandt (recruiter at Fernway)\nHi Sasha, we're excited to extend the offer: $142,000 base with a $10,000 signing bonus. Let me know your thoughts!\n\nFacts for your reply: You want to accept, but you are asking for $155,000 base. Your current total pay is $150,000. Another company offered $158,000, but you prefer Fernway's team. If base can't move, a $20,000 signing bonus would also work. You can start January 6.",
+    "instruction": "Write Sasha's reply to Leo.",
+    "max_words": 120,
+    "required_facts": [
+      {"id": "ask", "description": "Asks for $155,000", "any_of": ["155(,000|k)"]},
+      {"id": "current", "description": "Mentions the $150,000 current pay", "any_of": ["150(,000|k)"]},
+      {"id": "competing", "description": "Mentions the $158,000 offer", "any_of": ["158(,000|k)"]},
+      {"id": "prefer", "description": "Says they prefer Fernway", "any_of": ["prefer", "(first|top) choice", "(really|would) (like|love) to (join|work)", "excited (about|to)"]},
+      {"id": "fallback", "description": "Offers the $20,000 signing bonus instead", "any_of": ["\\b20(,000|k)[^.?!]*(sign|bonus)", "(sign|bonus)[^.?!]*\\b20(,000|k)"]},
+      {"id": "start", "description": "Gives January 6", "any_of": ["jan(uary)?\\.? ?6\\b", "\\b6(th)? (of )?jan"]}
+    ],
+    "forbidden": [
+      {"id": "accepts_as_is", "description": "Accepts the offer as it stands", "any_of": ["accept (the|your) offer as (is|it stands)", "i accept (the|your) offer"]}
+    ]
+  },
+  {
+    "id": "email-11-pushback",
+    "kind": "email",
+    "split": "heldout",
+    "title": "Say no to extra work from a manager",
+    "persona": "You are Kim, a frontend engineer.",
+    "context": "From: Raj Patel (your manager)\nHey Kim, could you also take on the onboarding redesign this sprint? Design wants it by the 30th.\n\nFacts for your reply: You can't take it this sprint. You're on the checkout rewrite, which is due on the 28th. You could start the redesign on December 2. Nina has done onboarding work before and might be free.",
+    "instruction": "Write Kim's reply to Raj.",
+    "max_words": 80,
+    "required_facts": [
+      {"id": "no", "description": "Says they can't take it this sprint", "any_of": ["can'?t", "cannot", "(won'?t|not) be able to", "don'?t have (the )?(room|capacity|bandwidth)", "not this sprint"]},
+      {"id": "checkout", "description": "Names the checkout rewrite", "any_of": ["checkout"]},
+      {"id": "due", "description": "Gives the 28th", "any_of": ["\\b28"]},
+      {"id": "later", "description": "Offers December 2", "any_of": ["dec(ember)?\\.? ?2\\b", "\\b2(nd)? (of )?dec"]},
+      {"id": "nina", "description": "Suggests Nina", "any_of": ["\\bnina\\b"]}
+    ],
+    "forbidden": [
+      {"id": "yes", "description": "Agrees to do it this sprint", "any_of": ["(happy|glad) to (take|pick) (it|this) (on|up)", "i('ll| can) (take|pick) (it|this) (on|up) this sprint"]}
+    ]
+  },
+  {
+    "id": "email-12-apology",
+    "kind": "email",
+    "split": "heldout",
+    "title": "Apologise to a teammate for a missed date",
+    "persona": "You are Ben, a backend engineer.",
+    "context": "No thread yet. Direct message to Carla, who is waiting on your API endpoint.\n\nFacts to include: You said the orders endpoint would be ready Monday, and it isn't. You underestimated the pagination work. It will be on staging Wednesday morning. In the meantime, she can use the mock server at mock.internal/orders. You're sorry this blocked her.",
+    "instruction": "Write Ben's message to Carla.",
+    "max_words": 80,
+    "required_facts": [
+      {"id": "late", "description": "Says it isn't ready", "any_of": ["(isn'?t|not|won'?t be) ready", "\\b(missed|slipped|late|behind)\\b"]},
+      {"id": "cause", "description": "Names the pagination work", "any_of": ["paginat"]},
+      {"id": "when", "description": "Gives Wednesday morning", "any_of": ["wednesday[^.?!]*(morning|am\\b)", "morning[^.?!]*wednesday"]},
+      {"id": "staging", "description": "Says it goes to staging", "any_of": ["staging"]},
+      {"id": "mock", "description": "Gives the mock server", "any_of": ["mock\\.internal/orders"]},
+      {"id": "sorry", "description": "Apologises", "any_of": ["sorry", "apolog"]}
+    ],
+    "forbidden": [
+      {"id": "ready_now", "description": "Claims it's ready now", "any_of": ["(is|it'?s) ready (now|today)", "already (on staging|done|live)"]}
+    ]
+  },
+  {
+    "id": "email-13-reference",
+    "kind": "email",
+    "split": "heldout",
+    "title": "Ask a former manager for a reference",
+    "persona": "You are Robin, a mobile developer looking for a new job.",
+    "context": "No thread yet. Email to Grace Kim, your manager at Lumen until last spring.\n\nFacts to include: You're applying for a senior iOS role at Harbor Health. You'd like her to be a reference. A recruiter, Ellen, may call her in the next two weeks. The most relevant work is the offline sync feature you shipped together. You've attached your current resume.",
+    "instruction": "Write Robin's email to Grace.",
+    "max_words": 100,
+    "required_facts": [
+      {"id": "role", "description": "Names the senior iOS role", "any_of": ["senior[^.?!]*ios", "ios[^.?!]*senior"]},
+      {"id": "company", "description": "Names Harbor Health", "any_of": ["harbor health"]},
+      {"id": "ask", "description": "Asks her to be a reference", "any_of": ["reference"]},
+      {"id": "ellen", "description": "Says Ellen may call", "any_of": ["\\bellen\\b"]},
+      {"id": "when", "description": "Says within two weeks", "any_of": ["(two|2) weeks"]},
+      {"id": "sync", "description": "Mentions the offline sync work", "any_of": ["sync"]},
+      {"id": "resume", "description": "Mentions the attached resume", "any_of": ["r[eé]sum[eé]", "\\bcv\\b"]}
+    ],
+    "forbidden": [
+      {"id": "assumes_yes", "description": "Assumes she has already agreed", "any_of": ["thanks for agreeing", "since you('ve| have) agreed"]}
+    ]
+  },
+  {
+    "id": "email-14-vendor",
+    "kind": "email",
+    "split": "heldout",
+    "title": "Turn down a sales pitch",
+    "persona": "You are Pat, an engineering manager.",
+    "context": "From: Steve Morris (account executive at LogSpring)\nHi Pat, following up on my last three emails. Do you have 30 minutes this week for a demo of LogSpring's observability platform?\n\nFacts for your reply: You're not interested. You signed a two-year contract with another vendor in September. You'd like to be taken off the follow-up list. You might look again when the contract ends in 2028.",
+    "instruction": "Write Pat's reply to Steve.",
+    "max_words": 70,
+    "required_facts": [
+      {"id": "no", "description": "Clearly declines", "any_of": ["not interested", "no thanks", "\\bpass(ing)?\\b", "(won'?t|don'?t|do not) need", "declin"]},
+      {"id": "contract", "description": "Mentions the two-year contract", "any_of": ["(two|2).?year"]},
+      {"id": "september", "description": "Says it was signed in September", "any_of": ["september", "\\bsept?\\b"]},
+      {"id": "list", "description": "Asks to stop the follow-ups", "any_of": ["(take|remove)[^.?!]*(off|from)", "stop[^.?!]*(email|follow|reach)", "no (more|further) (follow|email)"]},
+      {"id": "later", "description": "Mentions 2028", "any_of": ["2028"]}
+    ],
+    "forbidden": [
+      {"id": "demo", "description": "Agrees to a demo", "any_of": ["(happy|glad|open) to (see|do|take) (a|the) demo", "let'?s (set up|book|schedule)"]}
+    ]
+  },
+  {
+    "id": "email-15-incident",
+    "kind": "email",
+    "split": "heldout",
+    "title": "Send an outage update",
+    "persona": "You are Quinn, the on-call engineer leading an incident.",
+    "context": "Status update email to the support and sales leads during an outage.\n\nFacts to include: Since 9:40am ET, about 30% of logins are failing. The cause is an expired certificate on the auth service. A renewed certificate is being deployed now. You expect logins to recover by 11:00am ET. The next update will come at 10:30am ET or sooner. Customers don't need to reset their passwords.",
+    "instruction": "Write Quinn's update email, including a subject line.",
+    "max_words": 110,
+    "required_facts": [
+      {"id": "start", "description": "Gives the 9:40am start", "any_of": ["9:40"]},
+      {"id": "scope", "description": "Gives about 30% of logins", "any_of": ["30 ?%[^.?!]*log.?in", "log.?in[^.?!]*30 ?%", "30 percent"]},
+      {"id": "cause", "description": "Names the expired certificate", "any_of": ["(expired|expiring)[^.?!]*cert", "cert[^.?!]*expired"]},
+      {"id": "eta", "description": "Gives the 11:00am estimate", "any_of": ["11(:00)? ?(am|a\\.m\\.)", "11:00"]},
+      {"id": "next", "description": "Gives the 10:30 next update", "any_of": ["10:30"]},
+      {"id": "passwords", "description": "Says no password reset is needed", "any_of": ["password"]}
+    ],
+    "forbidden": [
+      {"id": "resolved", "description": "Claims it's already fixed", "any_of": ["(is|has been|now) (resolved|fixed)\\b", "fully recovered"]},
+      {"id": "breach", "description": "Implies a security breach", "any_of": ["breach", "hack", "compromis"]}
+    ]
   }
 ]
