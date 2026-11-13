@@ -45,7 +45,7 @@ class TaskTests(unittest.TestCase):
     def test_seed_tasks_load(self):
         tasks = load_tasks(TASKS_DIR)
         self.assertEqual(sum(t.kind == "email" for t in tasks.values()), 15)
-        self.assertEqual(sum(t.kind == "takehome" for t in tasks.values()), 5)
+        self.assertEqual(sum(t.kind == "takehome" for t in tasks.values()), 15)
 
     def test_rejects_bad_kind(self):
         with self.assertRaisesRegex(ValueError, "unknown kind"):
